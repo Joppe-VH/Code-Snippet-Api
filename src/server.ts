@@ -5,7 +5,7 @@ import express from "express";
 import { notFound } from "./controllers/notFoundController";
 import mongoose from "mongoose";
 import { errorMiddleware } from "./middleware/errorMiddleware";
-import exampleRoutes from "./routes/exampleRoutes";
+import snippetRoutes from "./routes/snippetRoutes";
 
 // Variables
 const app = express();
@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api", exampleRoutes);
+app.use("/api/snippets", snippetRoutes);
 app.all("*splat", notFound);
 app.use(errorMiddleware);
 
