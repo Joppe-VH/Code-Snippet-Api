@@ -7,7 +7,7 @@ import {
   snippetSchema,
 } from "../util";
 import { NotFoundError } from "../errors";
-
+import { itemServiceGetAll } from "../services/snippetService";
 export const addSnippet = async (req: Request, res: Response) => {
   const { title, code, language, tags, expiresIn } = snippetSchema.parse(
     req.body
@@ -21,9 +21,9 @@ export const addSnippet = async (req: Request, res: Response) => {
 };
 
 export const getSnippets = async (req: Request, res: Response) => {
-  const snippets = await Snippet.find();
+  const snippets = await itemServiceGetAll(req.query);
 
-  res.status(200).json(snippets.map(decodeSnippet));
+  res.status(200).json(snippets);
 };
 
 export const getSnippetById = async (req: Request, res: Response) => {
