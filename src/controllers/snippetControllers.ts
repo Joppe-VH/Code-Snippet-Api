@@ -1,33 +1,21 @@
 import { Request, Response } from "express";
-import { z } from "zod";
 import Snippet from "../models/snippetModel";
-import { encodedCode, decodeSnippet } from "../util";
+import {
+  decodeSnippet,
+  encodeSnippet,
+  snippetIdParamSchema,
+  snippetSchema,
+} from "../util";
 import { NotFoundError } from "../errors";
-import { isValidObjectId } from "mongoose";
 
 export const addSnippet = async (req: Request, res: Response) => {
-  const { title, code, language, tags, expiresIn } = z
-    .object({
-      title: z.string({ message: "Title is required" }),
-      code: z.string().transform(encodedCode),
-      language: z.string({ message: "Language is required" }),
-      tags: z.array(z.string({ message: "Tags must be an array of strings" }), {
-        message: "a tags  array is required",
-      }),
-      expiresIn: z.number().min(1).optional(),
-    })
-    .parse(req.body);
+  const { title, code, language, tags, expiresIn } = snippetSchema.parse(
+    req.body
+  );
 
-  const snippet = await Snippet.create({
-    title,
-    code,
-    language,
-    tags,
-    // don't add expiresAt key if expiresIn is not provided
-    ...(expiresIn
-      ? { expiresAt: new Date(Date.now() + expiresIn * 1000) }
-      : {}),
-  });
+  const snippet = await Snippet.create(
+    encodeSnippet({ title, code, language, tags, expiresIn })
+  );
 
   res.status(201).json(decodeSnippet(snippet));
 };
@@ -39,18 +27,30 @@ export const getSnippets = async (req: Request, res: Response) => {
 };
 
 export const getSnippetById = async (req: Request, res: Response) => {
-  const { id } = z
-    .object({
-      id: z
-        .string({ message: "id is required (string)" })
-        .refine(isValidObjectId, {
-          message: "id must be a valid mongoose Object ID",
-        }),
-    })
-    .parse(req.params);
+  const { id } = snippetIdParamSchema.parse(req.params);
+
   const snippet = await Snippet.findById(id);
+
   if (!snippet) throw new NotFoundError("Snippet not found");
-  if (snippet.expiresAt && snippet.expiresAt.getTime() < Date.now())
+  if (snippet.expiresAt && snippet.expiresAt.getUTCMilliseconds() < Date.now())
     throw new NotFoundError("Snippet expired");
+
+  res.status(200).json(decodeSnippet(snippet));
+};
+
+export const updateSnippet = async (req: Request, res: Response) => {
+  const { id } = snippetIdParamSchema.parse(req.params);
+  const { title, code, language, tags, expiresIn } = snippetSchema.parse(
+    req.body
+  );
+
+  const snippet = await Snippet.findByIdAndUpdate(
+    id,
+    encodeSnippet({ title, code, language, tags, expiresIn }),
+    { new: true }
+  );
+
+  if (!snippet) throw new NotFoundError("Snippet not found");
+
   res.status(200).json(decodeSnippet(snippet));
 };
