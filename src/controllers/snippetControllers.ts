@@ -5,6 +5,7 @@ import {
   encodeSnippet,
   snippetIdParamSchema,
   snippetSchema,
+  makePageLinkBuilder,
 } from "../util";
 import { NotFoundError } from "../errors";
 import { itemServiceGetAll } from "../services/snippetService";
@@ -21,7 +22,8 @@ export const addSnippet = async (req: Request, res: Response) => {
 };
 
 export const getSnippets = async (req: Request, res: Response) => {
-  const snippets = await itemServiceGetAll(req.query);
+  const getPageLink = makePageLinkBuilder(req);
+  const snippets = await itemServiceGetAll(req.query, getPageLink);
 
   res.status(200).json(snippets);
 };
