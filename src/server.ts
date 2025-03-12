@@ -4,6 +4,8 @@ import cors from "cors";
 import express from "express";
 import { notFound } from "./controllers/notFoundController";
 import mongoose from "mongoose";
+import { errorMiddleware } from "./middleware/errorMiddleware";
+import exampleRoutes from "./routes/exampleRoutes";
 
 // Variables
 const app = express();
@@ -14,8 +16,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api" /* temp */);
-app.all("*", notFound);
+app.use("/api", exampleRoutes);
+app.all("*splat", notFound);
+app.use(errorMiddleware);
 
 // Database connection
 try {
