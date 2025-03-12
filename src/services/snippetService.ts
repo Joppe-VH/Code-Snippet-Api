@@ -36,7 +36,12 @@ const buildSnippetFilter = (query: RawQuery<SnippetFilter>) => {
   }
 
   // date
-  andConditions.push({ expiresAt: { $gte: new Date(Date.now()) } });
+  andConditions.push({
+    $or: [
+      { expiresAt: { $exists: 0 } },
+      { expiresAt: { $gte: new Date(Date.now()) } },
+    ],
+  });
 
   return andConditions.length > 0 ? { $and: andConditions } : {};
 };
