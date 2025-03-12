@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import Snippet from "../models/snippetModel";
-import { encodedCode, decodedCode, decodeSnippet } from "../util";
+import { encodedCode, decodeSnippet } from "../util";
 export const addSnippet = async (req: Request, res: Response) => {
   const { title, code, language, tags, expiresIn } = z
     .object({
-      title: z.string(),
+      title: z.string({ message: "Title is required" }),
       code: z.string().transform(encodedCode),
-      language: z.string(),
-      tags: z.array(z.string()),
+      language: z.string({ message: "Language is required" }),
+      tags: z.array(z.string({ message: "Tags must be an array of strings" }), {
+        message: "a tags  array is required",
+      }),
       expiresIn: z.number().min(1).optional(),
     })
     .parse(req.body);
