@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/script.js"></script>
+</head>
+
+<body>
+  <h1>
+    Hello {{ title }}
+  </h1>
+
+  <form method="GET" action="/snippets">
+    <label for="language">Filter by Language:</label>
+    <select name="language" id="language-input">
+      <option value="default">All</option>
+      @each(language in languages)
+      <option {{ language===selectedLanguage ? 'selected' : '' }} value="{{ language }}">{{ language }}</option>
+      @end
+    </select>
+
+    <label for="tags">Filter by Tags:</label>
+    <select name="tags" id="tags-input">
+      <option value="">All</option>
+      @each(tag in tags)
+      <option {{ tag===selectedTags ? 'selected' : '' }} value="{{ tag }}">{{ tag }}</option>
+      @end
+    </select>
+  </form>
+
+  <ul>
+    @each(snippet in snippets)
+    <li>
+      <h2>{{ snippet.title }}</h2>
+      <p>{{ snippet.code }}</p>
+      <p>Language: {{ snippet.language }}</p>
+      <p>Tags: {{ snippet.tags }}</p>
+    </li>
+    @end
+  </ul>
+</body>
+
+</html>

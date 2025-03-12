@@ -38,7 +38,7 @@ const buildSnippetFilter = (query: RawQuery<SnippetFilter>) => {
   return andConditions.length > 0 ? { $and: andConditions } : {};
 };
 
-export const itemServiceGetAll = async (
+export const snippetServiceGetAll = async (
   query: RawQuery<SnippetFilter>,
   getPageLink: (page: number) => string
 ) => {
