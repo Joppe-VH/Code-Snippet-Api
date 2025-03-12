@@ -54,3 +54,16 @@ export const updateSnippet = async (req: Request, res: Response) => {
 
   res.status(200).json(decodeSnippet(snippet));
 };
+
+export const deleteSnippet = async (req: Request, res: Response) => {
+  const { id } = snippetIdParamSchema.parse(req.params);
+
+  const snippet = await Snippet.findByIdAndDelete(id);
+
+  if (!snippet) throw new NotFoundError("Snippet not found");
+
+  res.status(200).json({
+    message: "Snippet deleted",
+    deletedSnippet: decodeSnippet(snippet),
+  });
+};
